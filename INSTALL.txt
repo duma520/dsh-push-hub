@@ -1,0 +1,98 @@
+========================================================================
+ 推送中枢 dsh-push-hub  v0.40.2  安装说明（三步）
+========================================================================
+
+【这是什么】
+把一条消息推到 微信 / 飞书 / 钉钉 / 企业微信 / QQ / Telegram /
+Slack / Discord / Matrix / 群晖 Chat / 邮件 共 12 个通道。
+一个工具 push_hub_send 覆盖全部，凭据只存本机、不入库。
+
+【装好后你会得到】
+- 侧栏「推送中枢」整页面板（三通道卡片式设置界面，中文）
+- 3 个会话内工具：push_hub_send / push_hub_send_file / push_hub_selftest 等
+- 22 条 HTTP 路由：/@duma520/dsh-push-hub/api/*
+
+【第 0 步：确认你在用哪个 profile（必须，最容易踩的坑）】
+DSH 的不同 profile 是彼此独立的目录。装错 profile 的表现是：
+插件文件都在、界面却永远看不到入口、/api/info 永远 404。
+
+PowerShell 里查当前运行的实例指向哪个 profile：
+
+    Get-CimInstance Win32_Process -Filter "Name='node.exe'" |
+      Select-Object ProcessId, CommandLine |
+      Where-Object { $_.CommandLine -like '*dsh*' }
+
+输出里出现 \.dsh\profiles\desktop\ 就用 desktop，
+出现 \profiles\web\ 就用 web。下面所有路径里的 <profile> 都换成它。
+
+【第 1 步：把包放进本机并登记到 profile】
+假设你把本包解压/克隆到了 <插件根目录>\dsh-push-hub。
+
+编辑 <用户目录>\.dsh\profiles\<profile>\package.json，两处都要加：
+
+    "dependencies": {
+      "@duma520/dsh-push-hub": "link:<插件根目录>/dsh-push-hub"
+    },
+    "dsh": {
+      "profile": {
+        "bundles": [
+          "@duma520/dsh-push-hub"
+        ]
+      }
+    }
+
+【第 2 步：建 node_modules 链接（Windows 用 junction，不需要管理员）】
+
+    New-Item -ItemType Junction `
+      -Path   "<用户目录>\.dsh\profiles\<profile>\node_modules\@duma520\dsh-push-hub" `
+      -Target "<插件根目录>\dsh-push-hub"
+
+【第 3 步：重启 DSH，然后三处验证】
+A. 路由活着（PowerShell，端口换成你自己 DSH 的端口）：
+
+       curl.exe -s http://127.0.0.1:<端口>/@duma520/dsh-push-hub/api/info
+
+   期望返回 {"ok":true,"version":"0.40.2",...}。
+
+B. 通道齐不齐（在 DSH 会话里）：
+
+       push_hub_selftest()
+
+   期望 ok:true、registryComplete:true。
+
+C. 先预演再真发：
+
+       push_hub_send({ text: "测试", channels: "feishu", dry_run: true })
+
+   期望 dryRun:true、plan.feishu.blocks 有值。去掉 dry_run 就是真发。
+
+========================================================================
+配置与数据在哪
+========================================================================
+- 用户级配置（界面里填的都落这里，权限 0600）：
+  <用户目录>\.dsh\dsh-push-hub\config.json
+- 收件箱 / 发送回执 / 进度表：
+  <用户目录>\.dsh\dsh-push-hub\inbox.json、outbox.json、progress.json
+- 入站附件下载目录：
+  <用户目录>\.dsh\dsh-push-hub\files\<日期>\
+- 可用环境变量 DSH_PUSH_HUB_CONFIG 指定另一份配置文件。
+- config.example.json 是样例（全是占位符，没有真实凭据），可参考字段但不要直接覆盖上面的 config.json。
+
+【卸载】
+1. 从 package.json 的 dependencies 与 dsh.profile.bundles 里删掉 @duma520/dsh-push-hub；
+2. 删掉 node_modules\@duma520\dsh-push-hub 这个 junction；
+4. 想连数据一起清掉：删掉 <用户目录>\.dsh\dsh-push-hub\ 整个目录
+   （里面有你的机器人 token，删之前确认不再需要）。
+3. 重启 DSH。
+
+【开源仓库说明】
+本包只含插件本体。作者本机的 scaffold/（开发探针与回归脚本）与
+version/（历次备份快照）不在仓库里，因为它们绑定本机路径与本机真实数据。
+README 里凡出现 node scaffold/... 的命令，clone 仓库后都跑不了，属正常。
+
+========================================================================
+更多细节
+========================================================================
+README.md 是完整手册：逐项功能、配置字段、工作原理、排错手册、FAQ。
+遇到问题先看 README 的「排错手册」一节，按症状查。
+许可：见 LICENSE。

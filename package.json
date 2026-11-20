@@ -1,0 +1,49 @@
+{
+  "name": "@duma520/dsh-push-hub",
+  "version": "0.40.2",
+  "description": "推送中枢：把消息推到 微信 / 飞书 / 钉钉 / 企业微信 / QQ / Telegram / Slack / Discord / Matrix / 群晖 Chat / 邮件 十二个通道，凭据只存本机、不入库；带自有设置界面",
+  "private": true,
+  "type": "module",
+  "main": "./lib/index.js",
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md",
+    "docs"
+  ],
+  "license": "BSD-3-Clause",
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "scripts": {
+    "verify": "npx --yes dsh-plugin-standard@2 . --json"
+  },
+  "exports": {
+    ".": "./lib/index.js",
+    "./bus": "./lib/bus.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-ui-slots"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.2",
+    "@deepseek-ai/dsh-client-runtime": ">=0.2.0-rc.1 <1.0.0-0",
+    "@deepseek-ai/dsh-client-ui-slots": "^0.1.0-rc.6 || >=0.2.0-rc.1 <1.0.0-0",
+    "react": "^18.2.0 || ^19.0.0"
+  },
+  "dependencies": {
+    "@larksuiteoapi/node-sdk": "1.76.0"
+  }
+}
