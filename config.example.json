@@ -1,196 +1,50 @@
 {
-  "_readme": [
-    "这是占位符样例，不含任何真实凭据。",
-    "v0.10.0 起不再读 dsh-bridge / dsh-im-connect（按用户要求切断，避免账号混乱）：凭据只有本插件自己这一份。",
-    "实际写入的文件是 ~/.dsh/dsh-push-hub/config.json（用户级，权限 0600），界面自动保存的就是它。",
-    "本文件只用于放「覆盖项」：默认通道、换 peer、加群晖 Chat。",
-    "复制为 config.json 后按需修改；config.json 已在 .gitignore 里。",
-    "v0.2.0 起推荐改用界面：DSH 设置 -> 推送中枢，写的是 ~/.dsh/dsh-push-hub/config.json（用户级，0600）。",
-    "界面写入的那份优先级高于本文件（包根 config.json），但低于显式传入的 configPath。",
-    "v0.4.0 起机器人可以自己填：own_bots 里的账号优先级最高，并会被提到同通道列表最前面。",
-    "v0.4.0 起 default_channels 为空数组且 default_channels_explicit=true 表示【一个都不要】，不再回落内置三通道。",
-    "v0.6.0 起每个 own_bots 账号可带 target（发单聊还是发群）与 mention（@谁）；界面会自动保存，通常不用手改本文件。",
-    "v0.6.0 起群晖也写进 own_bots.synology_chat：type=webhook 填 webhookUrl，type=bot 填 nasUrl + token + userIds。",
-    "顶层 synology_chat 是老结构，仅保留读取兼容，界面不再写它。",
-    "v0.8.0 起新增顶层 proxy：一个代理地址 + 每通道一个开关。只给定死要翻墙的通道开（Telegram 必须开），其余直连。",
-    "v0.10.0 起界面上的密钥显示成指纹（前 6 位…后 4 位），点「明码」才向插件要一次原文；原文只活在浏览器内存里，不回写本文件。",
-    "v0.14.0 起一个机器人可以配多个投递目标：写 targets 数组（每项 kind+id），target 只保留第一条作为兼容旧版的回落值。上面 telegram 第一个账号就是多目标示例；只写 target 不写 targets 仍然照旧发一个。",
-    "v0.17.0 起每个账号可带三个高级字段：proxy（代理，留空用通道级开关）、maxMessageChars（分块长度，留空用通道上限）、chunkDelayMs（块间延迟毫秒，留空用通道默认）；邮件另有 allowSelfSigned（布尔，自建 SMTP 用自签证书时才勾）。上面 telegram 第一个账号给了前两个的示例。只填这些字段不算「有账号」。",
-    "v0.13.0 起通道从 5 个补到 12 个：新增 dingtalk / wecom / wecom_app / slack / discord / matrix / email，下面 own_bots 里各给了一个占位示例。七个新通道零新增依赖（邮件借 DSH profile 里已有的 nodemailer）。"
-  ],
-  "default_channels": [
-    "feishu",
-    "qq",
-    "wechat",
-    "synology_chat"
-  ],
-  "default_channels_explicit": true,
-  "proxy": {
-    "_comment": "只影响打开开关的通道；关着的照旧直连。地址留空则回落内置默认。",
-    "url": "http://192.0.2.10:20808",
-    "channels": {
-      "telegram": true,
-      "wechat": false,
-      "feishu": false,
-      "dingtalk": false,
-      "wecom": false,
-      "wecom_app": false,
-      "qq": false,
-      "slack": false,
-      "discord": false,
-      "matrix": false,
-      "synology_chat": false,
-      "email": false
-    }
-  },
-  "own_bots": {
-    "telegram": [
+  "_comment": "Push_Hub 的本地覆盖配置。默认凭据直接从 ~\.dsh\dsh-bridge\config.json 读，本文件只需要写你要改的键（浅合并，顶层键整体替换）。",
+
+  "default_channels": ["telegram", "feishu", "qq"],
+
+  "telegram": {
+    "accounts": [
       {
-        "name": "我的机器人",
-        "botToken": "123456789:AAH-占位-请换成BotFather给你的真token",
-        "proxy": "http://127.0.0.1:7890",
-        "maxMessageChars": 3500,
-        "chunkDelayMs": 500,
-        "targets": [
-          { "kind": "user", "id": "6317****92" },
-          { "kind": "group", "id": "-1001234567890" }
-        ],
-        "target": { "kind": "user", "id": "6317****92" },
-        "mention": { "mode": "none", "userIds": [] }
-      },
-      {
-        "name": "我的群",
-        "botToken": "123456789:AAH-占位-同一个机器人可以既发单聊又发群",
-        "proxy": "http://127.0.0.1:7890",
-        "target": { "kind": "group", "id": "-1001234567890" },
-        "mention": { "mode": "none", "userIds": [] }
-      }
-    ],
-    "feishu": [
-      {
-        "name": "公司自建应用",
-        "appId": "cli_占位appId",
-        "appSecret": "占位appSecret",
-        "domain": "",
-        "target": { "kind": "group", "id": "oc_占位chatid" },
-        "mention": { "mode": "all", "userIds": [] }
-      }
-    ],
-    "qq": [
-      {
-        "name": "QQ 群机器人",
-        "appId": "占位AppID",
-        "appSecret": "占位AppSecret",
-        "target": { "kind": "group", "id": "占位group_openid" },
-        "mention": { "mode": "user", "userIds": ["占位member_openid"] }
-      }
-    ],
-    "wechat": [
-      {
-        "name": "微信扫码机器人",
-        "token": "占位ilink bot token",
-        "accountId": "占位ilink_bot_id",
-        "baseUrl": "",
-        "target": { "kind": "user", "id": "占位ilink_user_id" },
-        "mention": { "mode": "none", "userIds": [] }
-      }
-    ],
-    "synology_chat": [
-      {
-        "_note": "v0.40.0 起 type 与群晖面板「整合」的三种类型一一对应：incoming / outgoing / bot。老值 \"webhook\" 与缺省值一律按 incoming 处理。",
-        "name": "群晖-传入的Webhook",
-        "type": "incoming",
-        "webhookUrl": "https://你的NAS:5001/webapi/entry.cgi?api=SYNO.Chat.External&method=incoming&version=2&token=%22你的TOKEN%22",
-        "_fallback_note": "webhookUrl 留空时可以只填 nasUrl + token，后端会自动拼出上面那条 URL。"
-      },
-      {
-        "_note": "「发出的 Webhook」是群晖往「你填的 URL」发请求的方向 —— 本插件只登记这几项，不发送也不接收。",
-        "name": "群晖-发出的Webhook（只登记）",
-        "type": "outgoing",
-        "outgoingUrl": "",
-        "channel": "任何公共频道",
-        "triggerWord": "",
-        "token": "占位64位令牌（群晖面板上的「令牌」，用于你这一侧验签）"
-      },
-      {
-        "_note": "「机器人」：incomingUrl 用来发消息（留空则用 nasUrl + token 自动拼），outgoingUrl 只是群晖的回调地址，只登记。",
-        "name": "群晖-机器人",
-        "type": "bot",
-        "incomingUrl": "",
-        "_nasUrl_note": "必须用 https。局域网 IP + 自签证书会撞 ERR_TLS_CERT_ALTNAME_INVALID（Node 的 fetch 不认自签证书），改用 QuickConnect 传入 URL 的域名。",
-        "nasUrl": "https://192-168-1-10.xxxx.quickconnect.cn:5001",
-        "token": "占位64位BotToken（机器人面板上的「令牌」）",
-        "userIds": "73,74",
-        "target": { "kind": "user", "id": "73" }
-      }
-    ],
-    "dingtalk": [
-      {
-        "name": "钉钉群",
-        "webhookUrl": "https://oapi.dingtalk.com/robot/send?access_token=占位access_token",
-        "secret": "SEC占位加签secret（机器人安全设置里勾了「加签」才要填）"
-      }
-    ],
-    "wecom": [
-      {
-        "name": "企业微信群",
-        "webhookUrl": "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=占位UUID"
-      }
-    ],
-    "wecom_app": [
-      {
-        "name": "企业微信自建应用",
-        "corpId": "ww占位企业ID",
-        "corpSecret": "占位应用Secret",
-        "agentId": "1000002",
-        "target": { "kind": "user", "id": "zhangsan" },
-        "mention": { "mode": "none", "userIds": [] }
-      }
-    ],
-    "slack": [
-      {
-        "name": "Slack 频道",
-        "botToken": "xoxb-占位botToken",
-        "target": { "kind": "group", "id": "#general" }
-      }
-    ],
-    "discord": [
-      {
-        "name": "Discord 频道",
-        "_note": "发送到必须填频道 ID（纯数字 Snowflake），不是频道名",
-        "botToken": "占位botToken",
-        "target": { "kind": "group", "id": "123456789012345678" }
-      }
-    ],
-    "matrix": [
-      {
-        "name": "Matrix 房间",
-        "homeserver": "https://matrix.org",
-        "accessToken": "占位accessToken",
-        "target": { "kind": "group", "id": "!abcdef:matrix.org" }
-      }
-    ],
-    "email": [
-      {
-        "name": "我的邮箱",
-        "smtpHost": "smtp.qq.com",
-        "smtpPort": 465,
-        "user": "you@example.com",
-        "pass": "占位授权码（不是登录密码）",
-        "from": "you@example.com",
-        "subject": "DSH 推送中枢",
-        "target": { "kind": "user", "id": "you@example.com" }
+        "name": "135",
+        "botToken": "<你的 bot token，或删掉本段直接用 dsh-bridge 里的>",
+        "proxy": "http://***已脱敏***-内网IP:20808",
+        "allowFrom": ["6317114992"]
       }
     ]
   },
-  "synology_chat": {
-    "_comment": "老结构，仅读取兼容；v0.6.0 起界面写的是上面 own_bots.synology_chat",
+
+  "feishu": {
     "accounts": [
       {
-        "name": "群晖 Chat",
-        "webhookUrl": "https://你的NAS:5001/webapi/entry.cgi?api=SYNO.Chat.External&method=incoming&version=2&token=%22你的TOKEN%22",
-        "sendChunkDelayMs": 1500,
-        "maxMessageChars": 2000
+        "name": "135",
+        "appId": "cli_xxxxxxxxxxxxxxxx",
+        "appSecret": "<飞书应用密钥>",
+        "domain": "feishu",
+        "allowFrom": ["ou_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"]
+      }
+    ]
+  },
+
+  "qq": {
+    "accounts": [
+      {
+        "name": "14386306",
+        "appId": "1905799217",
+        "appSecret": "<QQ 机器人 clientSecret>",
+        "allowFrom": ["6610BC7587D119042A0060CF987BDAEE"]
+      }
+    ]
+  },
+
+  "wechat": {
+    "accounts": [
+      {
+        "name": "duma640",
+        "token": "<iLink bot token>",
+        "accountId": "***已脱敏***-邮箱",
+        "baseUrl": "https://ilinkai.weixin.qq.com",
+        "allowFrom": ["***已脱敏***-邮箱"]
       }
     ]
   }
