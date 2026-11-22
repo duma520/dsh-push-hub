@@ -11,7 +11,7 @@
     "README.md",
     "docs"
   ],
-  "license": "BSD-3-Clause",
+  "license": "AGPL-3.0",
   "engines": {
     "node": "^22.19.0 || >=24.0.0"
   },
