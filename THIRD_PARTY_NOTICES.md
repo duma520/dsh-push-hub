@@ -8,4 +8,4 @@
 
 MIT 许可证允许在保留版权声明的前提下自由使用、修改与再分发。原始项目的版权归其作者所有。
 
-本插件自身以 BSD-3-Clause 发布，见 [LICENSE](LICENSE)。
+本插件自身以 GNU Affero General Public License v3.0（AGPL-3.0）发布，见 [LICENSE](LICENSE)。
