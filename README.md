@@ -42,7 +42,7 @@ Push_Hub 是一段可以直接 import 或命令行调用的 Python 代码，把�
 ### 第 1 步：确认 Python 能跑
 
 ```bash
-D:/tg_fetch_venv/Scripts/python.exe --version
+python --version
 ```
 
 应输出 Python 3.10.x。没有的话任何 3.8+ 都行，Push_Hub 只用标准库（urllib、json、ssl、base64）。
@@ -50,8 +50,8 @@ D:/tg_fetch_venv/Scripts/python.exe --version
 ### 第 2 步：看有哪些账号
 
 ```bash
-cd G:/Python_Code/Push_Hub
-D:/tg_fetch_venv/Scripts/python.exe -m pushhub --list
+cd ~/Push_Hub
+python -m pushhub --list
 ```
 
 正常输出：
@@ -71,7 +71,7 @@ wechat          9      9  duma640, duma7654, duma185, duma4445 …  (best-effort
 ### 第 3 步：发一条试试
 
 ```bash
-D:/tg_fetch_venv/Scripts/python.exe -m pushhub --selftest
+python -m pushhub --selftest
 ```
 
 期望输出：
@@ -119,20 +119,20 @@ qq        OK    已发 1 块
 ### 场景 A：最简单——编译完了告诉我
 
 ```bash
-make build && D:/tg_fetch_venv/Scripts/python.exe -m pushhub --title "编译完成" --text "耗时 4 分 12 秒"
+make build && python -m pushhub --title "编译完成" --text "耗时 4 分 12 秒"
 ```
 
 失败也要知道：
 
 ```bash
-make build; D:/tg_fetch_venv/Scripts/python.exe -m pushhub --title "编译结束" --text "见上一条日志"
+make build; python -m pushhub --title "编译结束" --text "见上一条日志"
 ```
 
 ### 场景 B：常见组合——长任务跑完自动通知
 
 ```bash
-cd G:/Python_Code/Push_Hub
-D:/tg_fetch_venv/Scripts/python.exe -u -m pushhub --watch dl3 --state-dir "G:/Python_Code/TG_Batch_Download/state" --idle-min 15 --max-hours 8 --quiet
+cd ~/Push_Hub
+python -u -m pushhub --watch dl3 --state-dir "~/TG_Batch_Download/state" --idle-min 15 --max-hours 8 --quiet
 ```
 
 它每 30 秒读一次 dl3_speed.json：
@@ -144,7 +144,7 @@ D:/tg_fetch_venv/Scripts/python.exe -u -m pushhub --watch dl3 --state-dir "G:/Py
 ### 场景 C：进阶——只推 QQ，指定账号，要 JSON
 
 ```bash
-D:/tg_fetch_venv/Scripts/python.exe -m pushhub --text "备份完成" --channels qq --account qq=14386306 --json
+python -m pushhub --text "备份完成" --channels qq --account qq=14386306 --json
 ```
 
 输出形如：
@@ -270,7 +270,7 @@ python -c "import socket;s=socket.create_connection(('***已脱敏***-内网IP',
 **原因**：授权头写错，或 appSecret 被重置。
 
 ```bash
-D:/tg_fetch_venv/Scripts/python.exe -m pushhub --text test --channels qq --json
+python -m pushhub --text test --channels qq --json
 ```
 
 如果 detail 里有 HTTP 401，去 QQ 开放平台后台确认 clientSecret。
@@ -286,7 +286,7 @@ D:/tg_fetch_venv/Scripts/python.exe -m pushhub --text test --channels qq --json
 ### 症状 F：--watch 一直不触发
 
 ```bash
-stat -c "%y" G:/Python_Code/TG_Batch_Download/state/dl3_speed.json
+stat -c "%y" ~/TG_Batch_Download/state/dl3_speed.json
 ```
 
 **原因 1**：任务根本没在写 speed.json（--watch 只能盯这种格式）。
@@ -380,10 +380,10 @@ Push_Hub/
 ### 自检命令
 
 ```bash
-cd G:/Python_Code/Push_Hub
-D:/tg_fetch_venv/Scripts/python.exe -m pushhub --list            # 凭据
-D:/tg_fetch_venv/Scripts/python.exe -m pushhub --selftest        # 实发
-D:/tg_fetch_venv/Scripts/python.exe -m pushhub --text x --dry-run  # 不发只看
+cd ~/Push_Hub
+python -m pushhub --list            # 凭据
+python -m pushhub --selftest        # 实发
+python -m pushhub --text x --dry-run  # 不发只看
 ```
 
 ---
